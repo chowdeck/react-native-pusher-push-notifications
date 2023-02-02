@@ -1,0 +1,28 @@
+{
+  "name": "react-native-pusher-push-notifications",
+  "version": "2.5.2",
+  "description": "Manage pusher channel subscriptions from within React Native JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/b8ne/react-native-pusher-push-notifications.git"
+  },
+  "keywords": [
+    "react-native",
+    "pusher",
+    "push",
+    "notifications"
+  ],
+  "author": "b8ne",
+  "license": "MIT",
+  "peerDependencies": {
+    "react-native": ">=0.60.0"
+  },
+  "bugs": {
+    "url": "https://github.com/b8ne/react-native-pusher-push-notifications/issues"
+  },
+  "homepage": "https://github.com/b8ne/react-native-pusher-push-notifications#readme"
+}
