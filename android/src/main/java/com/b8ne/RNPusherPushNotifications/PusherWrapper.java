@@ -105,7 +105,11 @@ public class PusherWrapper {
     }
 
     private String getActivityName(Activity activity) {
-        return activity.getClass().getSimpleName();
+        if (activity != null) {
+            return activity.getClass().getSimpleName();
+        } else {
+            return "UnknownActivity"; 
+        }
     }
 
     public void clearAllState() {
