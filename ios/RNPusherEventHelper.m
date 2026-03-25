@@ -6,7 +6,7 @@ RCT_EXPORT_MODULE();
 
 // The list of available events
 - (NSArray<NSString *> *)supportedEvents {
-    return @[@"registered", @"notification"];
+    return @[@"registered", @"notification", @"notificationOpened"];
 }
 
 // This function listens for the events we want to send out and will then pass the

@@ -92,6 +92,13 @@ RCT_EXPORT_METHOD(setUserId:(NSString *)userId token:(NSString *)token errorCall
         appState = @"inactive";
     }
 
+    if (state != UIApplicationStateActive) {
+        [RNPusherEventHelper emitEventWithName:@"notificationOpened" andPayload:@{
+          @"userInfo":userInfo,
+          @"appState":appState
+        }];
+    }
+
     if((bool)[userInfo valueForKeyPath:@"aps.data.incrementBadge"]) {
         NSInteger badgeCount = [[UIApplication sharedApplication] applicationIconBadgeNumber];
         [UIApplication sharedApplication].applicationIconBadgeNumber = (badgeCount+1);

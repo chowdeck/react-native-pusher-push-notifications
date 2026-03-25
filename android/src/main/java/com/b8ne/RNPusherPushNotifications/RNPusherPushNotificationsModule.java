@@ -1,12 +1,18 @@
 
 package com.b8ne.RNPusherPushNotifications;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 // SEE: https://docs.pusher.com/beams/reference/android
 
@@ -14,10 +20,24 @@ public class RNPusherPushNotificationsModule extends ReactContextBaseJavaModule 
 
   private final ReactApplicationContext reactContext;
     private PusherWrapper pusher;
+    private static Bundle pendingNotificationExtras = null;
 
     public RNPusherPushNotificationsModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+    }
+
+    /**
+     * Call this from MainActivity.onNewIntent() to capture notification data
+     * when the app is brought from background by tapping a notification.
+     */
+    public static void onNewIntent(Intent intent) {
+        if (intent != null && intent.getExtras() != null) {
+            boolean launchedFromHistory = (intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0;
+            if (!launchedFromHistory) {
+                pendingNotificationExtras = new Bundle(intent.getExtras());
+            }
+        }
     }
 
     private final LifecycleEventListener lifecycleEventListener = new LifecycleEventListener() {
@@ -25,6 +45,7 @@ public class RNPusherPushNotificationsModule extends ReactContextBaseJavaModule 
         @Override
         public void onHostResume() {
             pusher.onResume(getCurrentActivity());
+            emitPendingNotificationOpened();
         }
 
         @Override
@@ -117,6 +138,30 @@ public class RNPusherPushNotificationsModule extends ReactContextBaseJavaModule 
                 pusher.setOnSubscriptionsChangedListener(subscriptionChangedListener);
             }
         });
+    }
+
+    private void emitPendingNotificationOpened() {
+        if (pendingNotificationExtras == null) {
+            return;
+        }
+
+        Bundle extras = pendingNotificationExtras;
+        pendingNotificationExtras = null;
+
+        WritableMap payload = Arguments.createMap();
+        for (String key : extras.keySet()) {
+            Object value = extras.get(key);
+            if (value != null) {
+                payload.putString(key, value.toString());
+            }
+        }
+
+        WritableMap result = Arguments.createMap();
+        result.putMap("data", payload);
+
+        reactContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("notificationOpened", result);
     }
 
 }
